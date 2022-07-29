@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Imports;
+
+use App\Models\MstSap;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithMappedCells;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+
+class SapImport implements ToModel, WithStartRow, WithMultipleSheets, WithCalculatedFormulas, WithValidation
+{
+    /**
+    * @param array $row
+    *
+    * @return \Illuminate\Database\Eloquent\Model|null
+    */
+    public function model(array $row)
+    {
+        return new MstSap([
+            //
+            'baru_co' => $row[1],
+            'cfu' => $row[2],
+            'flag' => $row[3],
+            'uraian_wbs' => $row[4],
+            'comm_release' => $row[5],
+            'pay_release' => $row[6],
+            'wbs_element' => $row[7],
+            'purchasing_doc' => $row[8],
+            'kontrak' => $row[9],
+            'proses' => $row[10],
+            'ref_doc_no' => $row[11],
+            'item' => $row[12],
+            'cost_elem' => $row[13],
+            'name' => $row[14],
+            'ses_pelimpahan' => $row[15],
+            'witel' => $row[16],
+            'id_vendor' => $row[17],
+            'vendor' => $row[18],
+            'ta_non_ta' => $row[19],
+            'user' => $row[20],
+            'doc_date' => $row[21],
+            'nilai_pr_po_gr' => $row[22],
+            'value_tcur' => $row[23],
+            'status_pr' => $row[24],
+            'status_po' => $row[25],
+            'status_gr' => $row[26],
+            'debit_date' => $row[27],
+            'keterangan' => $row[28],
+            'achv_progi' => $row[29],
+            'tematik' => $row[30],
+            'status_sap' => $row[31]
+        ]);
+    }
+
+    public function startRow(): int
+    {
+        return 2;
+    }
+
+    public function sheets(): array
+    {
+        return [
+            0 => $this,
+        ];
+    }
+
+    public function rules(): array
+    {
+        return [
+            //'name' => 'required',
+            '14' => 'required'
+            // so on
+        ];
+    }
+}

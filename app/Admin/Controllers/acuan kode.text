@@ -1,0 +1,5 @@
+ $form->select('waspang_id', 'Waspang')->options(
+                Administrator::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')
+                    ->where('admin_role_users.role_id', '5')
+                    ->pluck('name', 'name')
+            );
