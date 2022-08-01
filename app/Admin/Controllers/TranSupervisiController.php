@@ -825,16 +825,22 @@ class TranSupervisiController extends AdminController
       if ($baseline->activity_id >= 1 && $baseline->activity_id <= 20) {
         $sumActualVolume = LogActual::where("project_id", $baseline->project_id)->where('approval_waspang',  'approve')->where("tran_baseline_id", $baseline->id)->sum('actual_volume');
       }
+      if ($baseline->activity_id == 19) {
+        $tgl1 = $actual_finish; // pendefinisian tanggal awal
+        $tgl2 = date('Y-m-d', strtotime('+7 days', strtotime($tgl1))); //operasi penjumlahan tanggal sebanyak 6 hari   
+        TranSupervisi::where("project_id", $baseline->project_id)
+          ->update([
+            'plan_golive' => $tgl2,            
+          ]);
+      }
       if ($baseline->activity_id == 21) {
         $sumActualVolume = LogActual::where("project_id", $baseline->project_id)->where('approval_tim_ut',  'approve')->where("tran_baseline_id", $baseline->id)->sum('actual_volume');
-        TranBaseline::where("project_id", $baseline->project_id)->where("activity_id", 21)
+        TranBaseline::where("project_id", $baseline->project_id)->where("activity_id", 22)
           ->update([
-            
             'actual_start' => $actual_start,
             'actual_status' => 'belum',
-            'actual_task' => 'NEED UPDATED'
-            
-         
+            'actual_task' => 'NEED UPDATED',
+            'actual_volume' => 1
           ]);
       }
       // UPDATE ACTUAL DI TRANSBASELINE    

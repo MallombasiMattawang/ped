@@ -9,14 +9,14 @@ use Encore\Admin\Widgets\Form;
 use Encore\Admin\Facades\Admin;
 use App\Models\TranAdministrasi;
 
-class addBast extends Form
+class addBarekon extends Form
 {
     /**
      * The form title.
      *
      * @var string
      */
-    public $title = 'Penerbitan BAST-1';
+    public $title = 'Pengiriman BA Rekonsiliasi';
 
     /**
      * Handle the form request.
@@ -41,34 +41,43 @@ class addBast extends Form
 
         // File path
         $filepath = 'evident/' . $filename;
-        
+
         //update dokumen di supervisi
         $cek = TranSupervisi::where("project_id", $request->project_id)->first();
         $progress_doc = $cek->progress_doc;
-       
-        //if ($cek->posisi_doc == 'MITRA REGIONAL') {
-            // update actual const di tansbaseline
-            TranBaseline::where("id", $request->tran_baseline_id)
-                ->update([
-                    'actual_finish' => null,                   
-                    'actual_volume' => 1,
-                    'actual_progress' =>  90,
-                    'actual_evident' => $filepath,
-                    'actual_status' => 'ADMINISTRASI',
-                    'actual_task' => 'NEED APPROVED',
-                    'actual_message' => $request->actual_message,
 
-                ]);
-            TranSupervisi::where("project_id", $request->project_id)
-                ->update([
-                    'status_doc' => 'FINISH',
-                    'status_const' => 'REKON',
-                    'posisi_doc' =>  'DOK OK',
-                    'progress_doc' => 'FINISH',
-                    'task' => 'FINISH',
-                    'file_doc_bast' => $filepath,
-                    'progress_actual' => 98,
-                ]);
+        //if ($cek->posisi_doc == 'MITRA REGIONAL') {
+        // update actual const di tansbaseline
+        TranBaseline::where("id", $request->tran_baseline_id)
+            ->update([
+               // 'actual_finish' => now(),
+                //'actual_volume' => 1,
+                // 'actual_progress' =>  100,
+                'actual_evident' => $filepath,
+                'actual_status' => 'ADMINISTRASI',
+                'actual_task' => 'NEED APPROVED',
+                'actual_message' => $request->actual_message,
+
+            ]);
+        $logAdministrasi = TranAdministrasi::create([
+            'project_id' => $request->project_id,
+            'status_doc' => 'ADMINISTRASI',
+            'posisi_doc' =>  'TELKOM REGIONAL',
+            //'progress_doc' => 'SEND TO WITEL',
+            'file_doc' => $filepath,
+            'status' => 'VERIFIKASI BA',
+            'message'  => $request->actual_message,
+        ]);
+        $logAdministrasi->save();
+        TranSupervisi::where("project_id", $request->project_id)
+            ->update([
+                'status_doc' => 'ADMINISTRASI',
+                'posisi_doc' =>  'TELKOM REGIONAL',
+                'progress_doc' => 'VERIFIKASI BA',
+                'task' => 'ADMINISTRASI',
+                'file_ba_rekon' => $filepath,
+                'progress_actual' => 90,
+            ]);
         //}
 
 
@@ -85,7 +94,7 @@ class addBast extends Form
     {
         $data = $this->data();
 
-        $this->hidden('project_id');
+        $this->text('project_id');
         $this->hidden('tran_baseline_id', 'Activity');
         $this->text('project_name', 'Lop Site ID')->readonly();
         $this->text('list_activity', 'Activity')->readonly();
@@ -96,7 +105,7 @@ class addBast extends Form
         $this->divider('Administrasi');
 
 
-        $this->file('actual_evident', 'Evident Dokumen BAST-1')->rules('mimes:jpg,png,pdf|required');
+        $this->file('actual_evident', 'Evident BA Rekonsiliasi')->rules('mimes:jpg,png,pdf|required');
 
         $this->textarea('actual_message', 'Catatan')->rows(10);
     }
@@ -112,8 +121,8 @@ class addBast extends Form
         if ($_GET) {
             $id = $_GET['id'];
 
-            $baseline = TranBaseline::where('project_id', $id)->where('activity_id', 23)->first();
-            if (!Admin::user()->inRoles(['hd-ped', 'administrator'])) {
+            $baseline = TranBaseline::findOrFail($id);
+            if ($baseline->supervisi->mitra_id != Admin::user()->id) {
                 return abort(404);
             }
             $actual_start = $baseline->actual_start;

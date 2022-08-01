@@ -33,6 +33,7 @@ use App\Admin\Forms\addApproveAdministrasi;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\AdminController;
 use App\Admin\Extensions\Tools\GridView;
+use App\Admin\Forms\addBarekon;
 use App\Admin\Forms\addBast;
 use App\Models\TranAdministrasi;
 //use Illuminate\Support\Facades\Request;
@@ -87,7 +88,7 @@ class TranAdministrasiController extends AdminController
         $grid->column('project_name', __('Project name'))->limit(30);
         $grid->column('supervisi_project.mitra_id', __('Mitra'))->limit(20);
         $grid->column('supervisi_sap.kontrak', __('NO. SP TELKOM'));
-      
+
         $grid->column('progress_doc', __('Progress Doc'))->limit(30);
         $grid->column('progress_actual')->display(function ($progress_actual) {
             return "<span style='color:blue'>$progress_actual %</span>";
@@ -179,6 +180,9 @@ class TranAdministrasiController extends AdminController
         $telkom_reject = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'REJECTED')->orderBy('id', 'DESC')->first();
         $telkom_approve = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'PROSES TANDA TANGAN')->orderBy('id', 'DESC')->first();
         $telkom_ttd = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'DOC DITANDA TANGANI')->orderBy('id', 'DESC')->first();
+        $telkom_verifikasi_ba = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'VERIFIKASI BA')->orderBy('id', 'DESC')->first();
+        $telkom_approve_ba = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'BA VERIFIED')->orderBy('id', 'DESC')->first();
+        $telkom_reject_ba = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'TELKOM REGIONAL')->where('status', 'REJECTED BA')->orderBy('id', 'DESC')->first();
 
 
         $witel = TranAdministrasi::where('project_id', $id)->where('posisi_doc', 'WITEL')->orderBy('id', 'DESC')->first();
@@ -187,35 +191,38 @@ class TranAdministrasiController extends AdminController
         $supervisi = TranSupervisi::where('project_id', $id)->first();
         $baseline = TranBaseline::where('project_id', $id)->where('activity_id', 22)->first();
 
-       
-            $content->title('Administrasi');
-            $content->description('Kelola administrasi Rekonsiliasi');
-            $content->view('admin.modul_administrasi.mitra', [
-                'project' => $project,
-                'mitra_area' => $mitra_area,
-                'pembuatan_dokumen' => $pembuatan_dokumen,
-                'send_to_witel' => $send_to_witel,
-                'witel_verifikasi' => $witel_verifikasi,
-                'witel_reject' => $witel_reject,
-                'witel_approve' => $witel_approve,
-                'witel_ttd' => $witel_ttd,
-                'witel' => $witel,
-                'mitra_regional' => $mitra_regional,
-                'telkom_regional' => $telkom_regional,
-                'send_to_regional' => $send_to_regional,
-                'regional_verifikasi' => $regional_verifikasi,
-                'regional_approve' => $regional_approve,
-                'regional_reject' => $regional_reject,
 
-                'telkom_verifikasi' => $telkom_verifikasi,
-                'telkom_reject' => $telkom_reject,
-                'telkom_approve' => $telkom_approve,
-                'telkom_ttd' => $telkom_ttd,
+        $content->title('Administrasi');
+        $content->description('Kelola administrasi Rekonsiliasi');
+        $content->view('admin.modul_administrasi.mitra', [
+            'project' => $project,
+            'mitra_area' => $mitra_area,
+            'pembuatan_dokumen' => $pembuatan_dokumen,
+            'send_to_witel' => $send_to_witel,
+            'witel_verifikasi' => $witel_verifikasi,
+            'witel_reject' => $witel_reject,
+            'witel_approve' => $witel_approve,
+            'witel_ttd' => $witel_ttd,
+            'witel' => $witel,
+            'mitra_regional' => $mitra_regional,
+            'telkom_regional' => $telkom_regional,
+            'send_to_regional' => $send_to_regional,
+            'regional_verifikasi' => $regional_verifikasi,
+            'regional_approve' => $regional_approve,
+            'regional_reject' => $regional_reject,
 
-                'baseline' => $baseline,
-                'supervisi' => $supervisi,
-            ]);
-        
+            'telkom_verifikasi' => $telkom_verifikasi,
+            'telkom_reject' => $telkom_reject,
+            'telkom_approve' => $telkom_approve,
+            'telkom_ttd' => $telkom_ttd,
+            'telkom_verifikasi_ba' => $telkom_verifikasi_ba,
+            'telkom_approve_ba' => $telkom_approve_ba,
+            'telkom_reject_ba' => $telkom_reject_ba,
+
+            'baseline' => $baseline,
+            'supervisi' => $supervisi,
+        ]);
+
         return $content;
         //     ->title('Tabbed form')
         //     ->body(Widgets\Tab::forms([
@@ -301,16 +308,7 @@ class TranAdministrasiController extends AdminController
                             'progress_actual' => 96,
                             'status_const' => 'REKON',
                         ]);
-                    TranBaseline::where("id", $baseline->id)
-                        ->update([
-                            'actual_start' => date('Y-m-d'),
-                            //'actual_finish' => date('Y-m-d'),
-                            //'actual_durasi' => 1,
-                            'actual_volume' => 1,
-                            'actual_progress' => 90,
-                            //'actual_task' =>  'APPROVED',
-                            'approval_message' =>  $request->approval_message,
-                        ]);
+                   
                     $logAdministrasi = TranAdministrasi::create([
                         'project_id' => $request->id,
                         'status_doc' => 'ADMINISTRASI',
@@ -374,7 +372,7 @@ class TranAdministrasiController extends AdminController
                     ->update([
                         'posisi_doc' => 'TELKOM REGIONAL',
                         'progress_doc' => 'VERIFIKASI DOC',
-                        'progress_actual' => 99,
+                        'progress_actual' => 90,
                         'status_const' => 'REKON',
                     ]);
 
@@ -509,6 +507,82 @@ class TranAdministrasiController extends AdminController
 
     }
 
+    public function SaveApproveBA(Request $request)
+    {
+        print_r($_POST);
+        $supervisi = TranSupervisi::where('project_id', $request->id)->first();
+        $baseline = TranBaseline::where('project_id', $supervisi->project_id)->where('activity_id', 22)->first();
+        if (Admin::user()->inRoles(['administrator', 'hd-ped'])) {
+            $start = strtotime($baseline->actual_start);
+            $finish = strtotime(date('Y-m-d'));
+            $jarak = $finish - $start;
+            $actual_durasi = $jarak / 60 / 60 / 24;
+            $actual_durasi = $actual_durasi + 1;
+            if ($request->approval == 'approve') {
+                TranBaseline::where("id", $baseline->id)
+                    ->update([
+                        'actual_finish' => date('Y-m-d'),
+                        'actual_volume' => 1,
+                        'actual_progress' => 100,
+                        'actual_durasi' =>  $actual_durasi,
+                        'actual_task' =>  'APPROVED',
+                        //'actual_evident' => $filepath
+
+                    ]);
+                TranSupervisi::where("project_id", $request->id)
+                    ->update([
+                        'status_doc' => 'FINISH',
+                        'posisi_doc' =>  'DOK OK',
+                        'progress_doc' => 'FINISH',
+                        'task' => 'FINISH',
+                        'progress_actual' => 100,
+                    ]);
+                $logAdministrasi = TranAdministrasi::create([
+                    'project_id' => $request->id,
+                    'status_doc' => 'ADMINISTRASI',
+                    'posisi_doc' => 'TELKOM REGIONAL',
+                    'status' => 'BA VERIFIED',
+                    'file_doc' => $baseline->actual_evident,
+                    'message'  => $request->approval_message,
+                ]);
+                $logAdministrasi->save();
+            } else if ($request->approval == 'reject') {
+                TranBaseline::where("id", $baseline->id)
+                    ->update([
+                        // 'actual_finish' => date('Y-m-d'),
+                        // //'actual_volume' => 1,
+                        // 'actual_progress' => 100,
+                        // 'actual_durasi' =>  $actual_durasi,
+                        'actual_task' =>  'REJECTED',
+                        //'actual_evident' => $filepath
+
+                    ]);
+                TranSupervisi::where("project_id", $request->id)
+                    ->update([
+                        'status_doc' => 'ADMINISTRASI',
+                        'posisi_doc' =>  'MITRA REGIONAL',
+                        'progress_doc' => 'REVISI BA',
+
+                    ]);
+                $logAdministrasi = TranAdministrasi::create([
+                    'project_id' => $request->id,
+                    'status_doc' => 'ADMINISTRASI',
+                    'posisi_doc' => 'TELKOM REGIONAL',
+                    'status' => 'REJECTED BA',
+                    'message'  => $request->approval_message,
+                ]);
+                $logAdministrasi = TranAdministrasi::create([
+                    'project_id' => $request->id,
+                    'status_doc' => 'ADMINISTRASI',
+                    'posisi_doc' => 'MITRA REGIONAL',
+                    'status' => 'REVISI BA',
+                    'message'  => $request->approval_message,
+                ]);
+                $logAdministrasi->save();
+            }
+        }
+    }
+
     public function SaveTtdAdministrasi(Request $request)
     {
         // echo '<pre>';
@@ -630,32 +704,32 @@ class TranAdministrasiController extends AdminController
                         'posisi_doc' => 'MITRA REGIONAL',
                         'progress_doc' => 'PENGIRIMAN BA REKON',
                         //'status_const' => 'BAST-1',
-                        'file_doc_rekon' =>  $filepath_bast,
+                        //'file_ba_rekon' =>  $filepath_bast,
                         //'progress_actual' => 100,
-                        'status_doc' => 'FINISH'
+                        //'status_doc' => 'FINISH'
                     ]);
-                $start = strtotime($baseline->actual_start);
-                $finish = strtotime(date('Y-m-d'));
+                // $start = strtotime($baseline->actual_start);
+                // $finish = strtotime(date('Y-m-d'));
 
-                $jarak = $finish - $start;
-                $actual_durasi = $jarak / 60 / 60 / 24;
-                $actual_durasi = $actual_durasi + 1;
-                TranBaseline::where("id", $baseline->id)
-                    ->update([
+                // $jarak = $finish - $start;
+                // $actual_durasi = $jarak / 60 / 60 / 24;
+                // $actual_durasi = $actual_durasi + 1;
+                // TranBaseline::where("id", $baseline->id)
+                //     ->update([
 
-                        // 'actual_finish' => date('Y-m-d'),
-                        // 'actual_volume' => 1,
-                        // 'actual_progress' => 100,
-                        // 'actual_durasi' =>  $actual_durasi,
-                        //'actual_task' =>  'APPROVED',
-                        'actual_evident' => $filepath
+                //         // 'actual_finish' => date('Y-m-d'),
+                //         // 'actual_volume' => 1,
+                //         // 'actual_progress' => 100,
+                //         // 'actual_durasi' =>  $actual_durasi,
+                //         //'actual_task' =>  'APPROVED',
+                //         //'actual_evident' => $filepath
 
-                    ]);
+                //     ]);
                 $logAdministrasi = TranAdministrasi::create([
                     'project_id' => $request->id,
                     'status_doc' => 'ADMINISTRASI',
-                    'posisi_doc' => 'DOK OK',
-                    'status' => 'DOK OK',
+                    'posisi_doc' => 'MITRA REGIONAL',
+                    'status' => 'PENGIRIMAN BA REKON',
                     'message'  => $request->approval_message,
                 ]);
                 $logAdministrasi->save();
@@ -682,9 +756,15 @@ class TranAdministrasiController extends AdminController
     }
 
     public function addBast(Content $content)
-  {
-    return $content
-      ->title('BAST-1')
-      ->body(new addBast());
-  }
+    {
+        return $content
+            ->title('BAST-1')
+            ->body(new addBast());
+    }
+    public function addBarekon(Content $content)
+    {
+        return $content
+            ->title('BAST-1')
+            ->body(new addBarekon());
+    }
 }

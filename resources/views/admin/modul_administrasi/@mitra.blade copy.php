@@ -47,8 +47,8 @@
                             href="#tab_mitra_regional" data-toggle="tab">MITRA REGIONAL</a></li>
                     <li><a class="{{ $project->posisi_doc == 'TELKOM REGIONAL' ? 'blinkrainbow' : '' }}"
                             href="#tab_telkom_regional" data-toggle="tab">TELKOM REGIONAL</a></li>
-                    <li><a class="{{ $project->posisi_doc == 'DOK OK' ? 'blinkrainbow' : '' }}" href="#tab_bast"
-                            data-toggle="tab">Penerbitan BAST-1</a></li>
+                    <li><a class="{{ $project->posisi_doc == 'DOK OK' ? 'blinkrainbow' : '' }}"
+                            href="#tab_bast" data-toggle="tab">Penerbitan BAST-1</a></li>
 
 
                 </ul>
@@ -133,7 +133,7 @@
                     </div>
 
                     <div class="tab-pane" id="tab_witel">
-                        <table class="table table-bordered text-center">
+                        <table class="table table-bordered">
                             <tr>
                                 <th>Posisi Dokumen</th>
                                 <th>Dok Verifikasi</th>
@@ -151,7 +151,8 @@
                                         @elseif ($witel->status == 'DOC VERIFIED' ||
                                             $witel->status == 'PROSES TANDA TANGAN' ||
                                             $witel->status == 'DOC DITANDA TANGANI')
-                                            <span class="label label-success"> <i class="fa fa-check"></i> </span>
+                                            <a href="{{ url('uploads/' . $witel_approve->file_doc) }}" target="_blank"
+                                                rel="noopener noreferrer" class="btn btn-success">  Doc Verified</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -162,7 +163,9 @@
                                 <td>
                                     @if (isset($witel))
                                         @if ($witel->status == 'DOC DITANDA TANGANI')
-                                            <span class="label label-success"> <i class="fa fa-check"></i> </span>
+                                            <a href="{{ url('uploads/' . $witel_ttd->file_doc) }}" target="_blank"
+                                                rel="noopener noreferrer" class="btn btn-success"> <i
+                                                    class="fa fa-file"></i> Dokumen Ditanda tangani</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -194,7 +197,7 @@
                     </div>
 
                     <div class="tab-pane" id="tab_mitra_regional">
-                        <table class="table table-bordered text-center">
+                        <table class="table table-bordered">
                             <tr>
                                 <th>Posisi Dokumen</th>
                                 <th>Verifikasi Internal</th>
@@ -213,7 +216,9 @@
                                             $mitra_regional->status == 'REVISI BA' ||
                                             $mitra_regional->status == 'BA VERIFIED' ||
                                             $mitra_regional->status == 'PENGIRIMAN BA REKON')
-                                            <span class="label label-success"> <i class="fa fa-check"></i> </span>
+                                            <a href="{{ url('uploads/' . $regional_approve->file_doc) }}"
+                                                target="_blank" rel="noopener noreferrer" class="btn btn-success"> <i
+                                                    class="fa fa-file"></i> Dokumen File</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -229,7 +234,8 @@
                                                 Rekon</a>
                                         @endif
                                     @else
-                                        <a href="#" class="btn btn-default" disabled> <i class="fa fa-upload"></i>
+                                        <a href="#" class="btn btn-default" disabled> <i
+                                                class="fa fa-upload"></i>
                                             Disabled</a>
                                     @endif
                                 </td>
@@ -248,7 +254,7 @@
                     </div>
 
                     <div class="tab-pane" id="tab_telkom_regional">
-                        <table class="table table-bordered text-center">
+                        <table class="table table-bordered">
                             <tr>
                                 <th>Posisi Dokumen</th>
 
@@ -273,7 +279,9 @@
                                             $telkom_regional->status == 'VERIFIKASI BA' ||
                                             $telkom_regional->status == 'REJECTED BA' ||
                                             $telkom_regional->status == 'BA VERIFIED')
-                                            <span class="label label-success"> <i class="fa fa-check"></i> </span>
+                                            <a href="{{ url('uploads/' . $telkom_approve->file_doc) }}"
+                                                target="_blank" rel="noopener noreferrer" class="btn btn-success"><i
+                                                    class="fa fa-file"></i> Dokumen File</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -290,8 +298,8 @@
                                             $telkom_regional->status == 'REJECTED BA' ||
                                             $telkom_regional->status == 'BA VERIFIED')
                                             <a href="{{ url('uploads/' . $telkom_ttd->file_doc) }}" target="_blank"
-                                                rel="noopener noreferrer" class="btn btn-default"> <i
-                                                    class="fa fa-download"> </i> Doc Finish</a>
+                                                rel="noopener noreferrer" class="btn btn-success"> <i
+                                                    class="fa fa-file"> </i> Dokumen TTD</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -305,11 +313,11 @@
                                         @if ($telkom_regional->status == 'DOC DITANDA TANGANI' || $telkom_regional->status == 'VERIFIKASI BA')
                                             <a href="{{ url('uploads/' . $telkom_verifikasi_ba->file_doc) }}"
                                                 target="_blank" rel="noopener noreferrer" class="btn btn-warning"> <i
-                                                    class="fa fa-download"> </i> Dokumen BA </a>
+                                                    class="fa fa-file"> </i> Dokumen BA Rekon</a>
                                         @elseif ($telkom_regional->status == 'BA VERIFIED')
                                             <a href="{{ url('uploads/' . $telkom_approve_ba->file_doc) }}"
-                                                target="_blank" rel="noopener noreferrer" class="btn btn-default"> <i
-                                                    class="fa fa-download"> </i> Dokumen BA </a>
+                                                target="_blank" rel="noopener noreferrer" class="btn btn-success"> <i
+                                                    class="fa fa-file"> </i> Dokumen BA Rekon</a>
                                         @else
                                             NO DATA
                                         @endif
@@ -403,7 +411,7 @@
 
         </div>
         <!-- /.col -->
-        <div class="col-md-4" style="height: 800px; overflow-y: scroll;">
+        <div class="col-md-4">
             <div class="box box-solid">
                 <div class="box-header with-border">
                     <h3 class="box-title">Timeline Administrasi</h3>
@@ -682,32 +690,6 @@
                             </div>
                         </li>
 
-                        <!-- timeline item -->
-                        <li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-envelope bg-blue"></i>
-                            <div class="timeline-item">
-                                <span class="time">
-                                    @if (isset($mitra_regional))
-                                        @if ($mitra_regional->status == 'REVISI BA' ||
-                                            $mitra_regional->status == 'BA VERIFIED' ||
-                                            $mitra_regional->status == 'PENGIRIMAN BA REKON')
-                                            <span class="label label-default"></i>
-                                                {{ $telkom_verifikasi_ba->created_at }} </span>
-                                        @else
-                                            <span class="label label-default"> NO
-                                                DATA</span>
-                                        @endif
-                                    @endif
-                                </span>
-
-                                <h3 class="timeline-header"><a href="#">Pengiriman BA Rekon</a></h3>
-
-
-
-                            </div>
-                        </li>
-
                         <!-- timeline time label -->
                         <li class="time-label">
                             <span class="bg-navy">
@@ -821,7 +803,8 @@
                                                             $telkom_regional->status == 'VERIFIKASI BA' ||
                                                             $telkom_regional->status == 'BA VERIFIED' ||
                                                             $telkom_regional->status == 'REJECTED_BA')
-                                                            <span class="label label-success">DOK OK</span>
+                                                            <span
+                                                                class="label label-success">DOK OK</span>
                                                         @else
                                                             <span class="label label-default">NO
                                                                 DATA</span>
@@ -838,68 +821,6 @@
 
                             </div>
                         </li>
-
-                        <li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-check bg-green"></i>
-                            <div class="timeline-item">
-                                <span class="time"></i>
-                                    @if (isset($telkom_regional))
-                                        @if ($telkom_regional->status == 'BA VERIFIED')
-                                            <span class="label label-default"></i>
-                                                {{ $telkom_approve_ba->created_at }}</span>
-                                        @else
-                                            <span class="label label-default"> NO DATA</span>
-                                        @endif
-                                    @endif
-                                </span>
-
-                                <h3 class="timeline-header"><a href="#">Verifikasi BA Rekon</a></h3>
-
-                                <div class="timeline-body">
-                                    <div class="">
-                                        <table class="table table-bordered">
-                                            <tr>
-                                                <td>DOKUMEN</td>
-                                                <td>
-                                                    @if (isset($telkom_regional))
-                                                        @if ($telkom_regional->status == 'BA VERIFIED')
-                                                            <a href="{{ url('uploads/' . $telkom_approve_ba->file_doc) }}"
-                                                                target="_blank" rel="noopener noreferrer"
-                                                                class="btn btn-default"><i class="fa fa-download"></i>
-                                                                File Doc</a>
-                                                        @else
-                                                            NO DATA
-                                                        @endif
-                                                    @else
-                                                        NO DATA
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>STATUS</td>
-                                                <td>
-                                                    @if (isset($telkom_regional))
-                                                        @if ($telkom_regional->status == 'BA VERIFIED')
-                                                            <span class="label label-success">DOK OK</span>
-                                                        @else
-                                                            <span class="label label-default">NO
-                                                                DATA</span>
-                                                        @endif
-                                                    @else
-                                                        NO DATA
-                                                    @endif
-                                                </td>
-                                            </tr>
-
-                                        </table>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </li>
-
-
 
                     </ul>
                 </div>

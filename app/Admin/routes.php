@@ -41,6 +41,8 @@ Route::group([
     $router->get('import-project', 'MstProjectController@importProject');
     $router->get('import-sap', 'MstSapController@importSap');
 
+    $router->post('generate-odp{id?}', 'TranInventoryController@generateOdp');
+
     $router->get('api/witel', 'MstProjectController@witel');
     $router->get('api/progress-usulan', 'HomeController@progressUsulan');
     $router->get('api/progress-sap', 'HomeController@progressSap');
@@ -73,6 +75,8 @@ Route::group([
     $router->get('add-actual{id?}/{activity?}', 'TranSupervisiController@addActual');
     $router->get('add-administrasi{id?}', 'TranSupervisiController@addAdministrasi');
     $router->get('add-bast{id?}/{activity?}', 'TranAdministrasiController@addBast');
+    $router->get('add-bast{id?}/{activity?}', 'TranAdministrasiController@addBast');
+    $router->get('add-barekon{id?}', 'TranAdministrasiController@addBarekon');
     $router->get('add-approve{id?}', 'TranSupervisiController@addApprove');
     $router->post('save-approve', 'TranSupervisiController@saveApprove');
 
@@ -80,6 +84,7 @@ Route::group([
     
     $router->get('add-document{id?}', 'TranAdministrasiController@addDocument');
     $router->post('save-administrasi', 'TranAdministrasiController@SaveApproveAdministrasi');
+    $router->post('save-ba', 'TranAdministrasiController@SaveApproveBA');
     $router->post('save-ttd', 'TranAdministrasiController@SaveTtdAdministrasi');
     $router->post('save-ttd-bast', 'TranAdministrasiController@SaveTtdBastAdministrasi');
 
@@ -89,6 +94,7 @@ Route::group([
     $router->get('log-generate{id?}', 'TranLogActivityController@logActivity');    
 
     $router->get('widgets/tab', 'HomeController@tab');
+    $router->get('widgets/stat', 'HomeController@stat');
     
 
 
