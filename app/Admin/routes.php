@@ -43,6 +43,10 @@ Route::group([
 
     $router->post('generate-odp{id?}', 'TranInventoryController@generateOdp');
 
+    $router->get('report/progress-usulan', 'HomeController@page_usulan');
+    $router->get('report/progress-sap', 'HomeController@page_sap');
+    $router->get('report/progress-dev', 'HomeController@page_dev');
+    
     $router->get('api/witel', 'MstProjectController@witel');
     $router->get('api/progress-usulan', 'HomeController@progressUsulan');
     $router->get('api/progress-sap', 'HomeController@progressSap');
@@ -53,6 +57,8 @@ Route::group([
     $router->get('api/get_plan{id?}', 'HomeController@get_plan');
     $router->get('api/get_approval{id?}', 'HomeController@get_approval');
     $router->get('api/get_inventory{id?}', 'HomeController@get_inventory');
+    $router->get('api/wbs', 'ApiController@wbs');
+    
     $router->get('acc-form{id?}', 'AccProjectController@accForm');
     
     $router->get('baseline-generate{id?}', 'TranSupervisiController@baseLineActivity');

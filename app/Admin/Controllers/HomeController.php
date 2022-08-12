@@ -50,7 +50,7 @@ class HomeController extends Controller
         }
 
         return $content
-            ->title('Dashboard Monitoring Telkom Peduli')
+            ->title('Dashboard Monica')
             ->view('admin.dashboard.index', [
                 'countProject' => $countProject,
             ]);
@@ -66,26 +66,29 @@ class HomeController extends Controller
     public function index(Content $content)
     {
         if (Admin::user()->inRoles(['hd-ped', 'administrator', 'witel'])) {
-            $content->title('Dashboard Monitoring Telkom Peduli');
-            $content->description('Description...');
-            $tab = new Tab();
-            $menu = view('admin.dashboard.report_progress_usulan');
-            $tab->add('Report Progress Usulan', $menu);
+            // $content->title('Dashboard Monica');
+            // $content->description('Description...');
+            // $tab = new Tab();
+            // $menu = view('admin.dashboard.report_progress_usulan');
+            // $tab->add('Report Progress Usulan', $menu);
 
-            $sap = view('admin.dashboard.report_progress_sap');
-            $tab->add('Progress SAP', $sap);
+            // $sap = view('admin.dashboard.report_progress_sap');
+            // $tab->add('Progress SAP', $sap);
 
-            $develop = view('admin.dashboard.report_progress_development');
-            $tab->add('Progress Development', $develop);
+            // $develop = view('admin.dashboard.report_progress_development');
+            // $tab->add('Progress Development', $develop);
 
-            $content->row($tab);
+            // $content->row($tab);
+            $content
+            ->title('Dashboard Monica')
+            ->view('admin.dashboard.welcome', []);
         } elseif (Admin::user()->inRoles(['mitra'])) {
             $lop_total = MstProject::where("mitra_id", Admin::user()->name)->count();
             $lop_konstruksi = TranSupervisi::where("mitra_id", Admin::user()->id)->where('status_doc', 'KONSTRUKSI')->count();
             $lop_administrasi = TranSupervisi::where("mitra_id", Admin::user()->id)->where('status_doc', 'ADMINISTRASI')->count();
             $lop_finish = TranSupervisi::where("mitra_id", Admin::user()->id)->where('status_doc', 'FINISH')->count();
             $content
-                ->title('Dashboard Monitoring Telkom Peduli')
+                ->title('Dashboard Monica')
                 ->view('admin.dashboard.report_user', [
                     'countProject' => 10,
                     'lop_total' => $lop_total,
@@ -95,14 +98,41 @@ class HomeController extends Controller
                 ]);
         } elseif (Admin::user()->inRoles(['waspang', 'tim-ut'])) {
             $content
-                ->title('Dashboard Monitoring Telkom Peduli')
+                ->title('Dashboard Monica')
                 ->view('admin.dashboard.report_approval', []);
         } elseif (Admin::user()->inRoles(['sdi'])) {
             $content
-                ->title('Dashboard Monitoring Telkom Peduli')
+                ->title('Dashboard Monica')
                 ->view('admin.dashboard.report_sdi', []);
         }
 
+
+        return $content;
+    }
+
+    public function page_usulan(Content $content)
+    {
+        $content
+        ->title('Dashboard Monica')
+        ->view('admin.dashboard.report_progress_usulan', []);
+
+        return $content;
+    }
+
+    public function page_sap(Content $content)
+    {
+        $content
+        ->title('Dashboard Monica')
+        ->view('admin.dashboard.report_progress_sap', []);
+
+        return $content;
+    }
+
+    public function page_dev(Content $content)
+    {
+        $content
+        ->title('Dashboard Monica')
+        ->view('admin.dashboard.report_progress_development', []);
 
         return $content;
     }
@@ -261,7 +291,7 @@ class HomeController extends Controller
     public function stat(Content $content)
     {
         return $content
-            ->title('Dashboard Monitoring Telkom Peduli')
+            ->title('Dashboard Monica')
             ->row(function (Row $row) {
                 $menu = view('admin.dashboard.menu_user');
                 $row->column(12, new Box('My Menu', $menu));

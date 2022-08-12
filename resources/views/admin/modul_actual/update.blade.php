@@ -597,7 +597,7 @@ Admin::style('.table {
                     @endforeach
                 ],
                 datasets: [{
-                    label: 'Nilai Target',
+                    label: 'Bobot Target',
                     backgroundColor: window.chartColors.red,
                     borderColor: window.chartColors.red,
                     data: [
@@ -607,7 +607,7 @@ Admin::style('.table {
                     ],
                     fill: false,
                 }, {
-                    label: 'Nilai Realiasai',
+                    label: 'Bobot Realiasai',
                     fill: false,
                     backgroundColor: window.chartColors.blue,
                     borderColor: window.chartColors.blue,
