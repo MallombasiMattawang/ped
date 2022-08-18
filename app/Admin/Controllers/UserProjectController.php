@@ -73,13 +73,13 @@ class UserProjectController extends AdminController
                 $filter->like('project_name', 'LOP / SITE ID');
                 $filter->like('supervisi_project.witel_id', 'WITEL');
                 $filter->like('supervisi_project.mitra_id', 'MITRA');
-                $filter->in('supervisi_project.status_project', 'STATUS PROJECT')->multipleSelect(['USULAN' => 'USULAN', 'DONE DRM' => 'DONE DRM', 'PELIMPAHAN' => 'PELIMPAHAN', 'PO' => 'PO/SP', 'DROP' => 'DROP']);
+                //$filter->in('supervisi_project.status_project', 'STATUS PROJECT')->multipleSelect(['USULAN' => 'USULAN', 'DONE DRM' => 'DONE DRM', 'PELIMPAHAN' => 'PELIMPAHAN', 'PO' => 'PO/SP', 'DROP' => 'DROP']);
             });
 
             $filter->column(1 / 2, function ($filter) {
-
-                $filter->between('supervisi_project.start_date', 'START DATE')->date();
-                $filter->between('supervisi_project.end_date', 'END DATE')->date();
+                $filter->like('supervisi_sap.kontrak', 'NO. SP TELKOM');
+                // $filter->between('supervisi_project.start_date', 'START DATE')->date();
+                // $filter->between('supervisi_project.end_date', 'END DATE')->date();
             });
         });
         $grid->column('supervisi_project.tematik', __('TEMATIK'));

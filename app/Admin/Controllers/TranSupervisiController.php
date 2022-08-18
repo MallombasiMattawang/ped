@@ -63,6 +63,7 @@ class TranSupervisiController extends AdminController
       $filter->column(1 / 2, function ($filter) {
         $filter->like('project_name', 'LOP / SITE ID');
         $filter->like('supervisi_project.witel_id', 'WITEL');
+        $filter->like('supervisi_sap.kontrak', 'NO. SP TELKOM');
       });
 
       $filter->column(1 / 2, function ($filter) {

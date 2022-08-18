@@ -208,12 +208,12 @@ class TranInventoryController extends AdminController
             //$form->text('status_abd', __('STATUS ABD'));
             $form->select('status_abd', __('STATUS ABD'))
                 ->options([
-                    'NO DATA' => 'NO DATA',
-                    'COMPLETING ABD' => 'COMPLETING ABD',
-                    'QE NEEDED' => 'QE NEEDED',
-                    'OLT NEEDED' => 'OLT NEEDED',
+                    'NO ABD' => 'NO ABD',
+                    'TIDAK VALID' => 'TIDAK VALID',
+                    'VALID-4' => 'VALID-4',
+                    'BA VALID' => 'BA VALID',
 
-                ])->default('NO DATA');
+                ])->default('NO ABD');
             $form->text('id_sw', __('ID SW'));
             $form->text('id_imon', __('ID IMON'));
             //$form->text('odp_port', __('ODP PORT'));

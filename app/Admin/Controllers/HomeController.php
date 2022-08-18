@@ -80,8 +80,8 @@ class HomeController extends Controller
 
             // $content->row($tab);
             $content
-            ->title('Dashboard Monica')
-            ->view('admin.dashboard.welcome', []);
+                ->title('Dashboard Monica')
+                ->view('admin.dashboard.welcome', []);
         } elseif (Admin::user()->inRoles(['mitra'])) {
             $lop_total = MstProject::where("mitra_id", Admin::user()->name)->count();
             $lop_konstruksi = TranSupervisi::where("mitra_id", Admin::user()->id)->where('status_doc', 'KONSTRUKSI')->count();
@@ -113,26 +113,124 @@ class HomeController extends Controller
     public function page_usulan(Content $content)
     {
         $content
-        ->title('Dashboard Monica')
-        ->view('admin.dashboard.report_progress_usulan', []);
+            ->title('Dashboard Monica')
+            ->view('admin.dashboard.report_progress_usulan', []);
 
         return $content;
+    }
+
+    public function tb_usulan(Request $request)
+    {
+        if ($_GET) {
+            $tipe_project = $_GET['tipe_project'];
+            $witel = $_GET['witel'];
+            $html = view('admin.dashboard.tb_usulan_filter', [
+                'tipe_project' => $tipe_project,
+                'witel' => $witel,
+            ]);
+        } else {
+            $html = view('admin.dashboard.tb_usulan');
+        }
+
+
+        return $html;
     }
 
     public function page_sap(Content $content)
     {
         $content
-        ->title('Dashboard Monica')
-        ->view('admin.dashboard.report_progress_sap', []);
+            ->title('Dashboard Monica')
+            ->view('admin.dashboard.report_progress_sap', []);
 
         return $content;
     }
 
+    public function tb_sap()
+    {        
+        
+            $ta = MstSap::where("ta_non_ta", 'TA')->count();
+            $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
+            $html = view('admin.dashboard.tb_sap', [
+                'ta' => $ta,
+                'nonta' => $nonta,
+            ]);
+        
+        return $html;
+    }
+
+    public function tb_sap_filter(Content $content)
+    {        
+      // print_r($_POST);
+       // die();
+            $cfu = $_POST['cfu'];
+            $wbs = $_POST['wbs'];
+            $mitra = $_POST['mitra'];
+            $ta = MstSap::where("ta_non_ta", 'TA')->count();
+            $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
+            $content -> view('admin.dashboard.tb_sap_filter', [
+                'ta' => $ta,
+                'nonta' => $nonta,
+                'cfu' => $cfu,
+                'wbs' => $wbs,
+                'mitra' => $mitra,
+            ]);
+       
+        return $content;
+    }
+
+    public function tb_dev_filter(Content $content)
+    {        
+       //print_r($_POST);
+        //die();
+            $tematik = $_POST['tematik'];
+            $witel = $_POST['witel'];
+            $mitra = $_POST['mitra'];
+           $query = TranSupervisi::where('witel_id', 'like', '%' . $witel . '%')->where('mitra_id', 'like', '%' . $mitra . '%')->get();
+            $content -> view('admin.dashboard.tb_dev_filter', [
+               'query' => $query,
+                'tematik' => $tematik,
+                'witel' => $witel,
+                'mitra' => $mitra,
+            ]);
+       
+        return $content;
+    }
+
+    public function tb_dev()
+    {
+        $tematik = '';
+        $witel = '';
+        $mitra = '';
+        if (isset($_GET['tematik'])) {
+            $tematik = $_GET['tematik'];
+            $witel = $_GET['witel'];
+            $mitra = $_GET['mitra'];
+        }
+        $html = view('admin.dashboard.tb_dev',[
+            'tematik' => $tematik,
+                'witel' => $witel,
+                'mitra' => $mitra,
+        ]);
+        return $html;
+    }
+
     public function page_dev(Content $content)
     {
+        $tematik = '';
+        $witel_2 = '';
+        $mitra = '';
+        if (isset($_GET['tematik'])) {
+            $tematik = $_GET['tematik'];
+            $witel_2 = $_GET['witel'];
+            $mitra = $_GET['mitra'];
+        }
         $content
-        ->title('Dashboard Monica')
-        ->view('admin.dashboard.report_progress_development', []);
+            ->title('Dashboard Monica')
+            ->view('admin.dashboard.report_progress_development', [
+                'tematik' => $tematik,
+                'witel_2' => $witel_2,
+                'mitra' => $mitra,
+            ]);
 
         return $content;
     }
@@ -280,7 +378,7 @@ class HomeController extends Controller
             }
             $d->title = $d->project_name . ' [STATUS GL SDI : ' . $title . ']';
             $d->start = $tgl_ct->actual_finish;
-            $d->url = url('ped-panel/tran-inventory/'. $d->id.'/edit');
+            $d->url = url('ped-panel/tran-inventory/' . $d->id . '/edit');
         }
         return response()->json(
             $project,
@@ -343,6 +441,79 @@ class HomeController extends Controller
             $nilai_po = MstProject::where("witel_id", $d->witel)->where('status_project', 'PO')->sum('rab_total');
             $port_po = MstProject::where("witel_id", $d->witel)->where('status_project', 'PO')->sum('odp_port');
             $lop_total = MstProject::where("witel_id", $d->witel)->where('status_project', '!=', 'DROP')->count();
+
+            $d->nilai_usulan = singkat_angka($nilai_usulan);
+            $d->port_usulan = singkat_angka($port_usulan);
+            $d->nilai_drm = singkat_angka($nilai_drm);
+            $d->port_drm = singkat_angka($port_drm);
+            $d->nilai_pelimpahan = singkat_angka($nilai_pelimpahan);
+            $d->port_pelimpahan = singkat_angka($port_pelimpahan);
+            $d->nilai_po = singkat_angka($nilai_po);
+            $d->port_po = singkat_angka($port_po);
+            $d->lop_total = singkat_angka($lop_total);
+            $d->nilai_total = singkat_angka($nilai_usulan + $nilai_drm + $nilai_pelimpahan + $nilai_po);
+            $d->port_total = singkat_angka($port_usulan + $port_drm + $port_pelimpahan + $port_po);
+        }
+        //make response JSON
+        return response()->json([
+            'rows'    => $posts,
+        ], 200);
+    }
+
+    public function progressUsulanFilter(Request $request)
+    {
+        //$filter = $_GET['witel_id'];
+        //echo $filter;
+        // print_r($_GET);
+        $witel_id = $_GET['witel'];
+        $tipe_project = $_GET['tipe_project'];
+
+        if ($tipe_project == 'all') {
+            $tipe = '';
+        } else {
+            $tipe = "->where('tipe_project', $tipe_project)";
+        }
+
+        if ($witel_id == 'PAPUABARAT') {
+            $witel_id = 'PAPUA BARAT';
+        }
+        if ($witel_id == 'SULUTMALUT') {
+            $witel_id = 'SULUT MALUT';
+        }
+
+        //    echo $witel_id;
+        //     die();
+        $posts = MstProject::where('witel_id', $witel_id)
+            //->whereIn('id', [2])
+            ->selectRaw("id")
+            ->selectRaw("sto_id")
+            ->groupBy('sto_id')
+            ->orderBy('sto_id', 'ASC')
+            ->get();
+
+        foreach ($posts as $d) {
+            if ($tipe_project == 'all') {
+                $nilai_usulan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'USULAN')->sum('rab_total');
+                $port_usulan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'USULAN')->sum('odp_port');
+                $nilai_drm = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'DONE DRM')->sum('rab_total');
+                $port_drm = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'DONE DRM')->sum('odp_port');
+                $nilai_pelimpahan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PELIMPAHAN')->sum('rab_total');
+                $port_pelimpahan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PELIMPAHAN')->sum('odp_port');
+                $nilai_po = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PO')->sum('rab_total');
+                $port_po = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PO')->sum('odp_port');
+                $lop_total = MstProject::where("sto_id", $d->sto_id)->where('status_project', '!=', 'DROP')->count();
+            } else {
+                $nilai_usulan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'USULAN')->where('tipe_project', $tipe_project)->sum('rab_total');
+                $port_usulan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'USULAN')->where('tipe_project', $tipe_project)->sum('odp_port');
+                $nilai_drm = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'DONE DRM')->where('tipe_project', $tipe_project)->sum('rab_total');
+                $port_drm = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'DONE DRM')->where('tipe_project', $tipe_project)->sum('odp_port');
+                $nilai_pelimpahan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PELIMPAHAN')->where('tipe_project', $tipe_project)->sum('rab_total');
+                $port_pelimpahan = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PELIMPAHAN')->where('tipe_project', $tipe_project)->sum('odp_port');
+                $nilai_po = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PO')->where('tipe_project', $tipe_project)->sum('rab_total');
+                $port_po = MstProject::where("sto_id", $d->sto_id)->where('status_project', 'PO')->where('tipe_project', $tipe_project)->sum('odp_port');
+                $lop_total = MstProject::where("sto_id", $d->sto_id)->where('status_project', '!=', 'DROP')->where('tipe_project', $tipe_project)->count();
+            }
+
 
             $d->nilai_usulan = singkat_angka($nilai_usulan);
             $d->port_usulan = singkat_angka($port_usulan);
@@ -469,19 +640,19 @@ class HomeController extends Controller
             $d->lop_konstruksi = $lop_konstruksi;
             $d->nilai_konstruksi_real = singkat_angka($nilai_konstruksi_real + $nilai_konstruksi_plan);
             $d->port_konstruksi_real = $port_konstruksi_real + $port_konstruksi_plan;
-            $persen_konstruksi = ($lop_konstruksi != 0) ? round($lop_konstruksi / $d->lop_total,1) * 100 : 0;
-            $d->persen_konstruksi = $persen_konstruksi.' %';
+            $persen_konstruksi = ($lop_konstruksi != 0) ? round($lop_konstruksi / $d->lop_total, 1) * 100 : 0;
+            $d->persen_konstruksi = $persen_konstruksi . ' %';
             //$rata=($totalnilai!=0)?($totalnilai/$jumlah,1) * 100:0;
 
             $d->lop_administrasi = $lop_administrasi;
             $d->nilai_administrasi_real = singkat_angka($nilai_administrasi_real + $nilai_administrasi_plan);
             $d->port_administrasi_real = $port_administrasi_real + $port_administrasi_plan;
-            $persen_administrasi = ($lop_administrasi != 0) ? round($lop_administrasi / $d->lop_total,1) * 100 : 0;
-            $d->persen_administrasi =$persen_administrasi.' %';
+            $persen_administrasi = ($lop_administrasi != 0) ? round($lop_administrasi / $d->lop_total, 1) * 100 : 0;
+            $d->persen_administrasi = $persen_administrasi . ' %';
 
             $d->nilai_total =  singkat_angka(($nilai_konstruksi_real + $nilai_konstruksi_plan) + ($nilai_administrasi_real + $nilai_administrasi_plan));
             $d->port_total =  $d->port_konstruksi_real + $d->port_administrasi_real;
-            $d->persen_total =  $persen_konstruksi +  $persen_administrasi. ' %';
+            $d->persen_total =  $persen_konstruksi +  $persen_administrasi . ' %';
 
             // $d->total_port_plan = $nilai_port;
             //dd($d->toJson());
@@ -636,8 +807,8 @@ class HomeController extends Controller
 
             $install_done = TranSupervisi::where("witel_id", $d->id)->whereBetween('progress_actual', [88, 100])->count();
             $install_port = TranSupervisi::where("witel_id", $d->id)->whereBetween('progress_actual', [88, 100])->sum('real_port');
-            $persen_done = ($install_port != 0) ? round($install_done / $target_project,1) * 100 . ' %' : 0;
-            
+            $persen_done = ($install_port != 0) ? round($install_done / $target_project, 1) * 100 . ' %' : 0;
+
 
             $d->target_project = $target_project;
             $d->target_port = $target_port;

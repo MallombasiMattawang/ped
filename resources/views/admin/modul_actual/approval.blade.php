@@ -279,7 +279,8 @@
             // Log a message to the console
             console.log("Hooray, it worked!");
             $('#approve').modal('hide');
-            $.admin.reload();
+            //$.admin.reload();
+            window.location.reload();
             if (response.error) {
                 $.admin.toastr.error(response.error, '', {
                     positionClass: "toast-top-center"
@@ -352,7 +353,8 @@
             // Log a message to the console
             console.log("Hooray, it worked!");
             $('#reject').modal('hide');
-            $.admin.reload();
+            //$.admin.reload();
+            window.location.reload();
             if (response.error) {
                 $.admin.toastr.error(response.error, '', {
                     positionClass: "toast-top-center"

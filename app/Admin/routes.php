@@ -44,11 +44,17 @@ Route::group([
     $router->post('generate-odp{id?}', 'TranInventoryController@generateOdp');
 
     $router->get('report/progress-usulan', 'HomeController@page_usulan');
+    $router->get('report/tb-usulan', 'HomeController@tb_usulan');
+    $router->get('report/tb-dev', 'HomeController@tb_dev');
+    $router->get('report/tb-sap', 'HomeController@tb_sap');
+    $router->post('report/progress-sap-filter', 'HomeController@tb_sap_filter');
+    $router->post('report/progress-dev-filter', 'HomeController@tb_dev_filter');
     $router->get('report/progress-sap', 'HomeController@page_sap');
     $router->get('report/progress-dev', 'HomeController@page_dev');
     
     $router->get('api/witel', 'MstProjectController@witel');
     $router->get('api/progress-usulan', 'HomeController@progressUsulan');
+    $router->get('api/progress-usulan-filter', 'HomeController@progressUsulanFilter');
     $router->get('api/progress-sap', 'HomeController@progressSap');
     $router->get('api/progress-dev', 'HomeController@progressDev');
     $router->get('api/progress-konstruksi', 'HomeController@progressKonstruksi');
@@ -58,6 +64,7 @@ Route::group([
     $router->get('api/get_approval{id?}', 'HomeController@get_approval');
     $router->get('api/get_inventory{id?}', 'HomeController@get_inventory');
     $router->get('api/wbs', 'ApiController@wbs');
+    $router->get('api/tipe-project', 'ApiController@tipe_project');
     
     $router->get('acc-form{id?}', 'AccProjectController@accForm');
     
