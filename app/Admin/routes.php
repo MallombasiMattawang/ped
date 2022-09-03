@@ -37,9 +37,12 @@ Route::group([
     $router->resource('log-actuals', TranLogActivityController::class);
 
     $router->resource('mst-projects2', MstProjectFormController::class);
+    $router->resource('mst-smilleys', SmilleyController::class);
 
     $router->get('import-project', 'MstProjectController@importProject');
     $router->get('import-sap', 'MstSapController@importSap');
+    $router->get('import-smilley', 'SmilleyController@importSmilley');
+    
 
     $router->post('generate-odp{id?}', 'TranInventoryController@generateOdp');
 

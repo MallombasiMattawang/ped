@@ -1,5 +1,5 @@
 
-<div class="col-md-6">
+{{-- <div class="col-md-6">
     <form class="form-horizontal">
         <div class="form-group">
             <label for="inputEmail3" class="col-sm-2 control-label">%TA </label>
@@ -16,7 +16,7 @@
        
     </form>
 
-</div>
+</div> --}}
 
 <table class="table table-bordered border-success" id="table-sap" data-toggle="table" data-show-refresh="true"
     data-buttons-class="primary" data-ajax-options="ajaxOptions" data-url="/ped-panel/api/progress-sap">

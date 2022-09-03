@@ -572,7 +572,18 @@ class TranSupervisiController extends AdminController
 
 
       $lists = TranBaseline::where("project_id", $id)->get();
+      $lists_asc_date = TranBaseline::where("project_id", $id)->orderBy('plan_finish', 'ASC')->get();
+      $end_date_plan = TranBaseline::where("project_id", $id)->whereNotNull('plan_finish')->orderBy('plan_finish', 'Desc')->first();
+      $end_date_actual = TranBaseline::where("project_id", $id)->whereNotNull('actual_finish')->orderBy('actual_finish', 'Desc')->first();
+      
+      $start = $project->start_date;
+      $end_plan = $end_date_plan->plan_finish;
+      $end_finish = $end_date_actual->actual_finish;
 
+     
+     
+
+     // die();
 
       $waspang = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  5)->get();
       $tim_ut = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  6)->get();
@@ -632,6 +643,7 @@ class TranSupervisiController extends AdminController
         'countActual' => $countActual,
         'sumDurasi' =>  $sumDurasi,
         'lists' => $lists,
+        'lists_asc_date' => $lists_asc_date,
         'id' => $id,
         'waspang' => $waspang,
         'tim_ut' => $tim_ut,
@@ -646,7 +658,10 @@ class TranSupervisiController extends AdminController
         'cek_rekon' => $cek_rekon,
         'progress_plan' => $progress_plan,
         'sum_selesai' => $sum_selesai,
-        'sum_belum' => $sum_belum
+        'sum_belum' => $sum_belum,
+        // 'start' => $start,
+        'end_date_plan' => $end_date_plan,
+        'end_date_actual' => $end_date_actual,
 
       ]));
     });
@@ -831,7 +846,7 @@ class TranSupervisiController extends AdminController
         $tgl2 = date('Y-m-d', strtotime('+7 days', strtotime($tgl1))); //operasi penjumlahan tanggal sebanyak 6 hari   
         TranSupervisi::where("project_id", $baseline->project_id)
           ->update([
-            'plan_golive' => $tgl2,            
+            'plan_golive' => $tgl2,
           ]);
       }
       if ($baseline->activity_id == 21) {

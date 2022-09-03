@@ -592,37 +592,70 @@ Admin::style('.table {
             type: 'line',
             data: {
                 labels: [
-                    @foreach ($lists as $list)
-                        '{{ $list->list_activity }}',
-                    @endforeach
+                    @php
+                    $start = $project->start_date;
+                    $end_plan = $end_date_plan->plan_finish;
+                    $end_finish = $end_date_actual->actual_finish;
+                    $end = $end_plan;
+                    if ($end_finish > $end_plan) {
+                        $end = $end_finish;
+                    }
+                       while (strtotime($start) <= strtotime($end)) {
+                            echo "'$start',";
+                         $start = date ("d-m-Y", strtotime("+1 day", strtotime($start)));//looping tambah 1 date
+                        }
+                       @endphp
+                   
                 ],
-                datasets: [{
-                    label: 'Bobot Target',
+                datasets: [
+                    {
+                    label: 'Bobot Plan',
                     backgroundColor: window.chartColors.red,
                     borderColor: window.chartColors.red,
                     data: [
-                        @foreach ($lists as $list)
-                            '{{ $list->bobot }}',
-                        @endforeach
+                        @php
+                        $start_2 = $project->start_date;
+                        $end_plan_2 = $end_date_plan->plan_finish;
+                        $end_finish_2 = $end_date_actual->actual_finish;
+                        $sum_bobot_plan = App\Models\TranBaseline::where("project_id", $project->id)->whereBetween('plan_finish', [$start_2,  $start_2])->sum('bobot');
+                        //echo "'$sum_bobot_plan',";
+                       while (strtotime($start_2) <= strtotime($end_plan_2)) {
+                            echo "'$sum_bobot_plan',";
+                         $start_2 = date ("Y-m-d", strtotime("+1 day", strtotime($start_2)));//looping tambah 1 date
+                         $sum_bobot_plan = App\Models\TranBaseline::where("project_id", $project->id)->whereBetween('plan_finish', ['2022-08-01',  $start_2])->sum('bobot');
+                        }
+                       @endphp
+                       
                     ],
                     fill: false,
-                }, {
-                    label: 'Bobot Realiasai',
+                }, 
+                {
+                    label: 'Bobot Real',
                     fill: false,
                     backgroundColor: window.chartColors.blue,
                     borderColor: window.chartColors.blue,
                     data: [
-                        @foreach ($lists as $list)
-                            '{{ $list->progress_bobot }}',
-                        @endforeach
+                        @php
+                        $start_2 = $project->start_date;
+                        $end_plan_2 = $end_date_plan->plan_finish;
+                        $end_finish_2 = $end_date_actual->actual_finish;
+                        $sum_bobot_real = App\Models\TranBaseline::where("project_id", $project->id)->whereBetween('actual_finish', [$start_2,  $start_2])->sum('bobot');
+                        //echo "'$sum_bobot_plan',";
+                       while (strtotime($start_2) <= strtotime($end_finish_2)) {
+                            echo "'$sum_bobot_real',";
+                         $start_2 = date ("Y-m-d", strtotime("+1 day", strtotime($start_2)));//looping tambah 1 date
+                         $sum_bobot_real = App\Models\TranBaseline::where("project_id", $project->id)->whereBetween('actual_finish', ['2022-08-01',  $start_2])->sum('bobot');
+                        }
+                       @endphp
                     ],
-                }]
+                }
+            ]
             },
             options: {
                 responsive: true,
                 title: {
                     display: true,
-                    text: 'TARGET VS REAL'
+                    text: 'Plan VS REAL'
                 },
                 tooltips: {
                     mode: 'index',
