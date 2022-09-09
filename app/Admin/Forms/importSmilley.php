@@ -40,7 +40,7 @@ class importSmilley extends Form
         {
             
             Excel::import(new SmilleyNilaiImport, public_path('/file_import/' . $nama_file));
-            Excel::import(new SmilleyVolumeImport, public_path('/file_import/' . $nama_file));
+            //Excel::import(new SmilleyVolumeImport, public_path('/file_import/' . $nama_file));
             admin_success('Processed import successfully.');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e)
         {

@@ -35,7 +35,30 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
 
         $rowIndex = $row->getIndex();
         $row      = $row->toArray();
-
+        $tgl_bast = null;
+        $tg_plan_start = null;
+        $tg_plan_finish = null;
+        $tg_actual_start = null;
+        $tg_edc = null;
+        $tg_toc = null;
+        if ($row[41] != null) {
+            $tgl_bast = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[41]);
+        }
+        if ($row[24] != null) {
+            $tg_plan_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[24]);
+        }
+        if ($row[25] != null) {
+            $tg_plan_finish = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[25]);
+        }
+        if ($row[26] != null) {
+            $tg_actual_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[26]);
+        }
+        if ($row[12] != null) {
+            $tg_edc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[12]);
+        }
+        if ($row[13] != null) {
+            $tg_toc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[13]);
+        }
         MstSmilleyNilai::updateOrCreate(
             [
                 'kt_lokasi' => $row[18],
@@ -53,8 +76,8 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
                 'ubis_owner' => $row[9],
                 'no_kontrak' => $row[10],
                 'nm_proyek' => $row[11],
-                'tg_edc' => $row[12],
-                'tg_toc' => $row[13],
+                'tg_edc' => $tg_edc,
+                'tg_toc' => $tg_toc,
                 'nm_tematik' => $row[14],
                 'nm_witel' => $row[15],
                 'nm_lokasi1' => $row[16],
@@ -65,9 +88,9 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
                 'pro_actual' => $row[21],
                 'pro_bast' => $row[22],
                 'status' => $row[23],
-                'tg_plan_start' => $row[24],
-                'tg_plan_finish' => $row[25],
-                'tg_actual_start' => $row[26],
+                'tg_plan_start' => $tg_plan_start,
+                'tg_plan_finish' => $tg_plan_finish,
+                'tg_actual_start' => $tg_actual_start,
                 'no_ut' => $row[27],
                 'tg_ut' => $row[28],
                 'no_bast1' => $row[29],
@@ -82,7 +105,8 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
                 'no_po4' => $row[38],
                 'no_po5' => $row[39],
                 'nm_vendor' => $row[40],
-                'tg_bast1' => $row[41],
+                "tg_bast1" => $tgl_bast,
+                //'tg_bast1' => $row[41],
             ]
 
         );
@@ -90,7 +114,7 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
 
     public function startRow(): int
     {
-        return 3;
+        return 2;
     }
 
     public function sheets(): array

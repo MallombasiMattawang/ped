@@ -575,16 +575,7 @@ class TranSupervisiController extends AdminController
       $lists_asc_date = TranBaseline::where("project_id", $id)->orderBy('plan_finish', 'ASC')->get();
       $end_date_plan = TranBaseline::where("project_id", $id)->whereNotNull('plan_finish')->orderBy('plan_finish', 'Desc')->first();
       $end_date_actual = TranBaseline::where("project_id", $id)->whereNotNull('actual_finish')->orderBy('actual_finish', 'Desc')->first();
-      
-      $start = $project->start_date;
-      $end_plan = $end_date_plan->plan_finish;
-      $end_finish = $end_date_actual->actual_finish;
-
-     
-     
-
-     // die();
-
+    
       $waspang = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  5)->get();
       $tim_ut = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  6)->get();
       $countBase = TranBaseline::where("project_id", $id)->where('bobot', '>=', '1')->count();
