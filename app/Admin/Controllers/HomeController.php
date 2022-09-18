@@ -3,11 +3,14 @@
 namespace App\Admin\Controllers;
 
 use App\Models\MstSap;
+use App\Models\LogPlan;
 use App\Models\MstWitel;
+use App\Models\LogActual;
 use App\Models\MstProject;
-use App\Models\MstWaspangUt;
-use Encore\Admin\Layout\Row;
 
+use App\Models\MstWaspangUt;
+use App\Models\TranBaseline;
+use Encore\Admin\Layout\Row;
 use App\Models\TranSupervisi;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
@@ -21,9 +24,8 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\Callout;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Collapse;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\LogActual;
-use App\Models\TranBaseline;
 use Encore\Admin\Controllers\Dashboard;
 use Illuminate\Support\Facades\Request;
 
@@ -146,53 +148,53 @@ class HomeController extends Controller
     }
 
     public function tb_sap()
-    {        
-        
-            $ta = MstSap::where("ta_non_ta", 'TA')->count();
-            $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
-            $html = view('admin.dashboard.tb_sap', [
-                'ta' => $ta,
-                'nonta' => $nonta,
-            ]);
-        
+    {
+
+        $ta = MstSap::where("ta_non_ta", 'TA')->count();
+        $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
+        $html = view('admin.dashboard.tb_sap', [
+            'ta' => $ta,
+            'nonta' => $nonta,
+        ]);
+
         return $html;
     }
 
     public function tb_sap_filter(Content $content)
-    {        
-      // print_r($_POST);
-       // die();
-            $cfu = $_POST['cfu'];
-            $wbs = $_POST['wbs'];
-            $mitra = $_POST['mitra'];
-            $ta = MstSap::where("ta_non_ta", 'TA')->count();
-            $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
-            $content -> view('admin.dashboard.tb_sap_filter', [
-                'ta' => $ta,
-                'nonta' => $nonta,
-                'cfu' => $cfu,
-                'wbs' => $wbs,
-                'mitra' => $mitra,
-            ]);
-       
+    {
+        // print_r($_POST);
+        // die();
+        $cfu = $_POST['cfu'];
+        $wbs = $_POST['wbs'];
+        $mitra = $_POST['mitra'];
+        $ta = MstSap::where("ta_non_ta", 'TA')->count();
+        $nonta = MstSap::where("ta_non_ta", 'NON TA')->count();
+        $content->view('admin.dashboard.tb_sap_filter', [
+            'ta' => $ta,
+            'nonta' => $nonta,
+            'cfu' => $cfu,
+            'wbs' => $wbs,
+            'mitra' => $mitra,
+        ]);
+
         return $content;
     }
 
     public function tb_dev_filter(Content $content)
-    {        
-       //print_r($_POST);
+    {
+        //print_r($_POST);
         //die();
-            $tematik = $_POST['tematik'];
-            $witel = $_POST['witel'];
-            $mitra = $_POST['mitra'];
-           $query = TranSupervisi::where('witel_id', 'like', '%' . $witel . '%')->where('mitra_id', 'like', '%' . $mitra . '%')->get();
-            $content -> view('admin.dashboard.tb_dev_filter', [
-               'query' => $query,
-                'tematik' => $tematik,
-                'witel' => $witel,
-                'mitra' => $mitra,
-            ]);
-       
+        $tematik = $_POST['tematik'];
+        $witel = $_POST['witel'];
+        $mitra = $_POST['mitra'];
+        $query = TranSupervisi::where('witel_id', 'like', '%' . $witel . '%')->where('mitra_id', 'like', '%' . $mitra . '%')->get();
+        $content->view('admin.dashboard.tb_dev_filter', [
+            'query' => $query,
+            'tematik' => $tematik,
+            'witel' => $witel,
+            'mitra' => $mitra,
+        ]);
+
         return $content;
     }
 
@@ -206,10 +208,10 @@ class HomeController extends Controller
             $witel = $_GET['witel'];
             $mitra = $_GET['mitra'];
         }
-        $html = view('admin.dashboard.tb_dev',[
+        $html = view('admin.dashboard.tb_dev', [
             'tematik' => $tematik,
-                'witel' => $witel,
-                'mitra' => $mitra,
+            'witel' => $witel,
+            'mitra' => $mitra,
         ]);
         return $html;
     }
@@ -828,6 +830,64 @@ class HomeController extends Controller
         return response()->json([
 
             'rows'    => $posts,
+        ], 200);
+    }
+
+    public function kurvaS($id)
+    {
+        $project = MstProject::where("id", $id)->first();
+        $supervisi = TranSupervisi::where('project_id', $id)->first();
+        // $lists = TranBaseline::where("project_id", $id)
+        //     ->select('id', 'activity_id', 'bobot', 'plan_durasi', 'plan_start', 'plan_finish')
+        //     ->get();
+        $lists_asc_date = TranBaseline::where("project_id", $id)->orderBy('plan_finish', 'ASC')->get();
+        $end_date_plan = TranBaseline::where("project_id", $id)->whereNotNull('plan_finish')->orderBy('plan_finish', 'Desc')->first();
+        $end_date_actual = TranBaseline::where("project_id", $id)->whereNotNull('actual_finish')->orderBy('id', 'Desc')->first();
+
+        $start = $project->start_date;
+        $end_plan = $end_date_plan->plan_finish;
+        $end_finish = 0;
+        if ($end_date_actual) {
+            $end_finish = $end_date_actual->actual_finish;
+        }
+
+        $end_today = date('Y-m-d');
+        $end = $end_plan;
+        if ($end_finish > $end_plan) {
+            $end = $end_finish;
+        }
+        if ($supervisi->progress_actual < 100) {
+            $end = $end_today;
+        }
+        $sum_bobot_plan = LogPlan::where('project_id', $project->id)
+            ->whereBetween('log_date', [$project->start_date, $start])
+            ->sum('log_bobot');
+        $sum_bobot_real = TranBaseline::where('project_id', $project->id)
+            ->whereBetween('actual_finish', [$project->start_date, $start])
+            ->sum('bobot');
+
+        $items = array();
+        $i = 1;
+        while (strtotime($start) <= strtotime($end)) {
+            $items[] = ([
+                'date' => $start,
+                'bobot_plan' => number_format($sum_bobot_plan, 1, '.', ''),
+                'bobot_real' => $sum_bobot_real
+            ]);
+            $start = date('Y-m-d', strtotime('+1 day', strtotime($start))); //looping tambah 1 date
+            $sum_bobot_plan = LogPlan::where('project_id', $project->id)
+                ->whereBetween('log_date', [$project->start_date, $start])
+                ->sum('log_bobot');
+            $sum_bobot_real = TranBaseline::where('project_id', $project->id)
+                ->whereBetween('actual_finish', [$project->start_date, $start])
+                ->sum('bobot');
+        }
+
+        //make response JSON
+        return response()->json([
+            'status' => 'success',
+            'data'   => $items,
+            //'date' => $person,
         ], 200);
     }
 }

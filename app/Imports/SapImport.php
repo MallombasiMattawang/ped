@@ -34,6 +34,14 @@ class SapImport implements OnEachRow, WithStartRow, WithMultipleSheets, WithCalc
 
         $rowIndex = $row->getIndex();
         $row      = $row->toArray();
+        $doc_date = null;
+        $debit_date = null;
+        if ($row[21] != null) {
+            $doc_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[21])->format('Y-m-d');
+        }
+        if ($row[27] != null) {
+            $debit_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[27])->format('Y-m-d');
+        }
 
         MstSap::updateOrCreate(
             [
@@ -60,13 +68,13 @@ class SapImport implements OnEachRow, WithStartRow, WithMultipleSheets, WithCalc
                 'vendor' => $row[18],
                 'ta_non_ta' => $row[19],
                 'user' => $row[20],
-                'doc_date' => $row[21],
+                'doc_date' => $doc_date,
                 'nilai_pr_po_gr' => $row[22],
                 'value_tcur' => $row[23],
                 'status_pr' => $row[24],
                 'status_po' => $row[25],
                 'status_gr' => $row[26],
-                'debit_date' => $row[27],
+                'debit_date' => $debit_date,
                 'keterangan' => $row[28],
                 'achv_progi' => $row[29],
                 'tematik' => $row[30],

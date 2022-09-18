@@ -32,6 +32,7 @@ use App\Admin\Actions\Project\Baseline;
 use App\Admin\Actions\Project\ActualActivity;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\AdminController;
+use App\Models\LogPlan;
 
 class TranSupervisiController extends AdminController
 {
@@ -489,14 +490,29 @@ class TranSupervisiController extends AdminController
     $baseline = TranBaseline::where('id', $request->baseline_id)->first();
     $project = MstProject::where('id', $baseline->project_id)->first();
     if ($request->plan_finish >= $request->plan_start && $request->plan_finish <=  $project->end_date) {
+      //delete di logPlan
+      LogPlan::where('baseline_id', $baseline->id)->delete();
 
+      // udpated plan
       TranBaseline::where("id", $request->baseline_id)
         ->update([
           'plan_start' => $request->plan_start,
           'plan_finish' => $request->plan_finish,
           'plan_durasi' => $request->plan_durasi
         ]);
+      $start = $request->plan_start;
+      $log_bobot = $baseline->bobot / $request->plan_durasi;
 
+      for ($i = 1; $i <= $request->plan_durasi; $i++) {
+        $logPlan = LogPlan::create([
+          'project_id' => $baseline->project_id,
+          'baseline_id' => $baseline->id,
+          'log_date' =>  $start,
+          'log_bobot' =>  $log_bobot
+        ]);
+        $logPlan->save();
+        $start = date('Y-m-d', strtotime('+1 day', strtotime($start))); //looping tambah 1 date
+      }
 
       if ($baseline->activity_id == 2 || $baseline->activity_id == 9 || $baseline->activity_id == 19 || $baseline->activity_id == 20 || $baseline->activity_id == 21 || $baseline->activity_id == 22 || $baseline->activity_id == 23) {
         TranBaseline::where("id", $request->baseline_id + 1)
@@ -575,7 +591,8 @@ class TranSupervisiController extends AdminController
       $lists_asc_date = TranBaseline::where("project_id", $id)->orderBy('plan_finish', 'ASC')->get();
       $end_date_plan = TranBaseline::where("project_id", $id)->whereNotNull('plan_finish')->orderBy('plan_finish', 'Desc')->first();
       $end_date_actual = TranBaseline::where("project_id", $id)->whereNotNull('actual_finish')->orderBy('actual_finish', 'Desc')->first();
-    
+   
+
       $waspang = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  5)->get();
       $tim_ut = MstWaspangUt::join('admin_role_users', 'admin_users.id', '=', 'admin_role_users.user_id')->where('role_id', '=',  6)->get();
       $countBase = TranBaseline::where("project_id", $id)->where('bobot', '>=', '1')->count();

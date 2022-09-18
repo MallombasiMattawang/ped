@@ -33,7 +33,7 @@ class SmilleyController extends AdminController
         $grid_1 = new Grid(new MstSmilleyNilai());
         $grid_1->tools(function ($tools) {
             $tools->append('<a href="/ped-panel/import-smilley" class="btn btn-danger btn-sm"><i class="fa fa-upload"></i>&nbsp;&nbsp; Import Tabel Smilley</a>');
-            $tools->append('<a href="/uploads/template_excel/TEMPLATE_SAP.xlsx" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download"></i>&nbsp;&nbsp;  Template Tabel Smilley</a>');
+            //$tools->append('<a href="/uploads/template_excel/TEMPLATE_SAP.xlsx" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download"></i>&nbsp;&nbsp;  Template Tabel Smilley</a>');
         });
 
         $grid_1->column('id', __('Id'));

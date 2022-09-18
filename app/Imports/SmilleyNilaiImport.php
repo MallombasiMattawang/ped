@@ -27,11 +27,7 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
         //     ->update([
         //         'status_project' => $row[31]
         //     ]);
-        // TranSupervisi::where("project_name", $row[14])
-        //     ->update([
-        //         'real_nilai' => $row[22],
-        //         //'real_port' => $row[31],
-        //     ]);
+       
 
         $rowIndex = $row->getIndex();
         $row      = $row->toArray();
@@ -42,23 +38,30 @@ class SmilleyNilaiImport implements OnEachRow, WithStartRow, WithMultipleSheets,
         $tg_edc = null;
         $tg_toc = null;
         if ($row[41] != null) {
-            $tgl_bast = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[41]);
+            $tgl_bast = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[41])->format('Y-m-d');
         }
         if ($row[24] != null) {
-            $tg_plan_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[24]);
+            $tg_plan_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[24])->format('Y-m-d');
         }
         if ($row[25] != null) {
-            $tg_plan_finish = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[25]);
+            $tg_plan_finish = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[25])->format('Y-m-d');
         }
         if ($row[26] != null) {
-            $tg_actual_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[26]);
+            $tg_actual_start = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[26])->format('Y-m-d');
         }
         if ($row[12] != null) {
-            $tg_edc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[12]);
+            $tg_edc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[12])->format('Y-m-d');
         }
         if ($row[13] != null) {
-            $tg_toc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[13]);
+            $tg_toc = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[13])->format('Y-m-d');
         }
+
+        TranSupervisi::where("project_name", $row[18])
+        ->update([
+            'edc' => $tg_edc,
+            'toc' => $tg_toc,
+        ]);
+        
         MstSmilleyNilai::updateOrCreate(
             [
                 'kt_lokasi' => $row[18],

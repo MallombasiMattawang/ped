@@ -67,6 +67,7 @@ Route::group([
     $router->get('api/get_plan{id?}', 'HomeController@get_plan');
     $router->get('api/get_approval{id?}', 'HomeController@get_approval');
     $router->get('api/get_inventory{id?}', 'HomeController@get_inventory');
+    $router->get('api/kurva_s/{id?}', 'HomeController@kurvaS');
     $router->get('api/wbs', 'ApiController@wbs');
     $router->get('api/tipe-project', 'ApiController@tipe_project');
     

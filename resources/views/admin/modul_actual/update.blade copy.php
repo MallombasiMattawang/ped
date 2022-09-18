@@ -566,9 +566,9 @@ Admin::style('.table {
 <script>
     $(function() {
 
-        var dateLabel = [],
-            planData = [],
-            actualData = []
+        function randomScalingFactor() {
+            return Math.floor(Math.random() * 100)
+        }
 
         window.chartColors = {
             red: 'rgb(255, 99, 132)',
@@ -580,87 +580,137 @@ Admin::style('.table {
             grey: 'rgb(201, 203, 207)'
         };
 
-        async function dummyChart() {
-            await getDummyData()
+        var config = {
+            type: 'line',
+            data: {
+                labels: [
+                    @php
+                        $start = $project->start_date;
+                        $end_plan = $end_date_plan->plan_finish;
+                        $end_finish = $end_date_actual->actual_finish;
+                        $end_today = date('Y-m-d');
+                        $end = $end_plan;
+                        if ($end_finish > $end_plan) {
+                            $end = $end_finish;
+                        }
+                        if ($supervisi->progress_actual < 100) {
+                            $end = $end_today;
+                        }
+                        while (strtotime($start) <= strtotime($end)) {
+                            echo "'$start',";
+                            $start = date('d-m-Y', strtotime('+1 day', strtotime($start))); //looping tambah 1 date
+                        }
+                    @endphp
 
-            var config = {
-                type: 'line',
-                data: {
-                    labels: dateLabel,
-                    datasets: [{
-                            label: 'Bobot Plan',
-                            backgroundColor: window.chartColors.red,
-                            borderColor: window.chartColors.red,
-                            data: planData,
-                            fill: false,
-                        },
-                        {
-                            label: 'Bobot Real',
-                            backgroundColor: window.chartColors.green,
-                            borderColor: window.chartColors.green,
-                            data: actualData,
-                            fill: false,
-                        },
+                ],
+                datasets: [{
+                        label: 'Bobot Plan',
+                        backgroundColor: window.chartColors.red,
+                        borderColor: window.chartColors.red,
+                        data: [
 
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Grafik Plan VS Grafik REAL'
+                            @php
+                                $start_2 = $project->start_date;
+                                $end_plan_2 = $end_date_plan->plan_finish;
+                                $end_finish_2 = $end_date_actual->actual_finish;
+                                $end_today = date('Y-m-d');
+                                $end = $end_plan_2;
+                                if ($end_finish_2 > $end_plan_2) {
+                                    $end = $end_finish_2;
+                                }
+                                if ($supervisi->progress_actual < 100) {
+                                    $end = $end_today;
+                                }
+                                $sum_bobot_real = App\Models\TranBaseline::where('project_id', $project->id)
+                                    ->whereBetween('plan_finish', [$start_2, $start_2])
+                                    ->sum('bobot');
+                                //echo "'$sum_bobot_plan',";
+                                while (strtotime($start_2) <= strtotime($end)) {
+                                    echo "'$sum_bobot_real',";
+                                    $start_2 = date('Y-m-d', strtotime('+1 day', strtotime($start_2))); //looping tambah 1 date
+                                    $sum_bobot_real = App\Models\TranBaseline::where('project_id', $project->id)
+                                        ->whereBetween('plan_finish', [$project->start_date, $start_2])
+                                        ->sum('bobot');
+                                }
+                            @endphp
+
+                        ],
+                        fill: false,
                     },
-                    tooltips: {
-                        mode: 'index',
-                        intersect: true,
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        intersect: true
-                    },
-                    scales: {
-                        scaleShowValues: true,
-                        xAxes: [{
-                            ticks: {
-                                autoSkip: true
-                            }
-                        }],
-                        
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Value'
-                            }
-                        }]
+                    {
+                        label: 'Bobot Real',
+                        fill: false,
+                        backgroundColor: window.chartColors.blue,
+                        borderColor: window.chartColors.blue,
+                        data: [
+                            @php
+                                $start_2 = $project->start_date;
+                                $end_plan_2 = $end_date_plan->plan_finish;
+                                $end_finish_2 = $end_date_actual->actual_finish;
+                                $end_today = date('Y-m-d');
+                                $end = $end_plan_2;
+                                if ($end_finish_2 > $end_plan_2) {
+                                    $end = $end_finish_2;
+                                }
+                                if ($supervisi->progress_actual < 100) {
+                                    $end = $end_today;
+                                }
+                                $sum_bobot_real = App\Models\TranBaseline::where('project_id', $project->id)
+                                    ->whereBetween('actual_finish', [$start_2, $start_2])
+                                    ->sum('bobot');
+                                //echo "'$sum_bobot_plan',";
+                                while (strtotime($start_2) <= strtotime($end)) {
+                                    echo "'$sum_bobot_real',";
+                                    $start_2 = date('Y-m-d', strtotime('+1 day', strtotime($start_2))); //looping tambah 1 date
+                                    $sum_bobot_real = App\Models\TranBaseline::where('project_id', $project->id)
+                                        ->whereBetween('actual_finish', [$project->start_date, $start_2])
+                                        ->sum('bobot');
+                                }
+                            @endphp
+                        ],
                     }
+                ]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Grafik Plan VS Grafik REAL'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: true,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    scaleShowValues: true,
+                    xAxes: [{
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }],
+                    // xAxes: [{
+                    //     display: true,
+                    //     scaleLabel: {
+                    //         display: true,
+                    //         labelString: 'Month'
+                    //     }
+                    // }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Value'
+                        }
+                    }]
                 }
-            };
+            }
+        };
 
-            var ctx = document.getElementById('line_target_real').getContext('2d');
-            new Chart(ctx, config);
-        }
-
-        dummyChart()
-
-        //Fetch Data from API
-
-        async function getDummyData() {
-            const apiUrl = "http://localhost:8000/ped-panel/api/kurva_s/17"
-
-            const response = await fetch(apiUrl)
-            const barChatData = await response.json()
-
-            const actual = barChatData.data.map((x) => x.bobot_real)
-           // console.log(salary)
-            const plan = barChatData.data.map((x) => x.bobot_plan)
-            const date = barChatData.data.map((x) => x.date)
-
-            actualData = actual
-            planData = plan
-            dateLabel = date
-
-        }
-
+        var ctx = document.getElementById('line_target_real').getContext('2d');
+        new Chart(ctx, config);
     });
 </script>
